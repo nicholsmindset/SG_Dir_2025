@@ -103,6 +103,10 @@ export interface Database {
           is_verified: boolean
           status: 'pending' | 'approved' | 'rejected'
           submitted_by: string | null
+          business_hours: Json | null
+          average_rating: number
+          review_count: number
+          favorite_count: number
           created_at: string
           updated_at: string
         }
@@ -128,6 +132,10 @@ export interface Database {
           is_verified?: boolean
           status?: 'pending' | 'approved' | 'rejected'
           submitted_by?: string | null
+          business_hours?: Json | null
+          average_rating?: number
+          review_count?: number
+          favorite_count?: number
           created_at?: string
           updated_at?: string
         }
@@ -153,6 +161,10 @@ export interface Database {
           is_verified?: boolean
           status?: 'pending' | 'approved' | 'rejected'
           submitted_by?: string | null
+          business_hours?: Json | null
+          average_rating?: number
+          review_count?: number
+          favorite_count?: number
           created_at?: string
           updated_at?: string
         }
@@ -321,6 +333,186 @@ export interface Database {
           valid_until?: string | null
           is_active?: boolean
           created_by?: string | null
+          created_at?: string
+        }
+      }
+      reviews: {
+        Row: {
+          id: string
+          business_id: string
+          user_id: string
+          rating: number
+          review_text: string | null
+          photos: string[] | null
+          helpful_count: number
+          visit_date: string | null
+          status: 'pending' | 'approved' | 'rejected' | 'flagged'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          business_id: string
+          user_id: string
+          rating: number
+          review_text?: string | null
+          photos?: string[] | null
+          helpful_count?: number
+          visit_date?: string | null
+          status?: 'pending' | 'approved' | 'rejected' | 'flagged'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          business_id?: string
+          user_id?: string
+          rating?: number
+          review_text?: string | null
+          photos?: string[] | null
+          helpful_count?: number
+          visit_date?: string | null
+          status?: 'pending' | 'approved' | 'rejected' | 'flagged'
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      review_responses: {
+        Row: {
+          id: string
+          review_id: string
+          user_id: string
+          response_text: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          review_id: string
+          user_id: string
+          response_text: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          review_id?: string
+          user_id?: string
+          response_text?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      review_helpfulness: {
+        Row: {
+          review_id: string
+          user_id: string
+          is_helpful: boolean
+          created_at: string
+        }
+        Insert: {
+          review_id: string
+          user_id: string
+          is_helpful: boolean
+          created_at?: string
+        }
+        Update: {
+          review_id?: string
+          user_id?: string
+          is_helpful?: boolean
+          created_at?: string
+        }
+      }
+      special_hours: {
+        Row: {
+          id: string
+          business_id: string
+          date: string
+          open_time: string | null
+          close_time: string | null
+          is_closed: boolean
+          reason: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          business_id: string
+          date: string
+          open_time?: string | null
+          close_time?: string | null
+          is_closed?: boolean
+          reason?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          business_id?: string
+          date?: string
+          open_time?: string | null
+          close_time?: string | null
+          is_closed?: boolean
+          reason?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      collections: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          description: string | null
+          is_public: boolean
+          slug: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          description?: string | null
+          is_public?: boolean
+          slug?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          description?: string | null
+          is_public?: boolean
+          slug?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      favorites: {
+        Row: {
+          id: string
+          user_id: string
+          business_id: string
+          collection_id: string | null
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          business_id: string
+          collection_id?: string | null
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          business_id?: string
+          collection_id?: string | null
+          notes?: string | null
           created_at?: string
         }
       }
