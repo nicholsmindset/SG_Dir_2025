@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'About Us - Singapore Halal Directory | Our Mission & Values',
@@ -15,26 +17,15 @@ export default function AboutPage() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Singapore Halal Directory',
-    url: 'https://singaporehalaldir.com',
-    logo: 'https://singaporehalaldir.com/logo.png',
+    url: 'https://halalsg.com',
+    logo: 'https://halalsg.com/logo.png',
     description: 'Singapore\'s most comprehensive halal business directory featuring verified MUIS-certified businesses',
-    foundingDate: '2025',
+    foundingDate: '2024',
     areaServed: {
       '@type': 'Country',
       name: 'Singapore',
     },
     slogan: 'Your trusted guide to halal-certified businesses in Singapore',
-  };
-
-  const aboutPageSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'AboutPage',
-    name: 'About Singapore Halal Directory',
-    description: 'Learn about our mission to provide Singapore\'s most comprehensive halal business directory',
-    mainEntity: {
-      '@type': 'Organization',
-      name: 'Singapore Halal Directory',
-    },
   };
 
   return (
@@ -43,173 +34,130 @@ export default function AboutPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutPageSchema) }}
-      />
 
-      <div className="min-h-screen">
+      <Header />
+
+      <div className="min-h-screen bg-[#f6f8f7]">
         {/* Hero Section */}
-        <section className="relative bg-gradient-to-br from-green-600 via-emerald-600 to-teal-700 text-white py-20">
-          <div className="absolute inset-0 bg-black opacity-10"></div>
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                About Singapore Halal Directory
-              </h1>
-              <p className="text-xl md:text-2xl text-green-50 leading-relaxed">
-                Your trusted guide to halal-certified businesses across Singapore
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Mission Section */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">
-                Our Mission
-              </h2>
-              <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                Singapore Halal Directory was founded to solve a critical problem facing Singapore's Muslim community:
-                <strong className="text-green-700"> the difficulty of verifying halal certification</strong> across thousands of businesses
-                in our diverse food and retail landscape.
-              </p>
-              <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                We believe every Muslim in Singapore deserves quick, reliable access to verified halal-certified businesses
-                without the uncertainty and time spent searching across fragmented sources. Our platform brings together
-                Singapore's entire halal business ecosystem into one comprehensive, easy-to-navigate directory.
-              </p>
-              <div className="bg-green-50 border-l-4 border-green-600 p-6 rounded-r-lg">
-                <p className="text-xl font-semibold text-green-900 italic">
-                  "Making halal certification verification simple, trustworthy, and accessible to every Singaporean."
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Statistics Section */}
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
-              By the Numbers
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              <div className="bg-white p-8 rounded-lg shadow-md text-center">
-                <div className="text-5xl font-bold text-green-600 mb-2">5,000+</div>
-                <div className="text-xl text-gray-700 font-semibold">Verified Businesses</div>
-                <p className="text-gray-600 mt-2">All MUIS-certified halal establishments</p>
-              </div>
-              <div className="bg-white p-8 rounded-lg shadow-md text-center">
-                <div className="text-5xl font-bold text-green-600 mb-2">28</div>
-                <div className="text-xl text-gray-700 font-semibold">Areas Covered</div>
-                <p className="text-gray-600 mt-2">Every district across Singapore</p>
-              </div>
-              <div className="bg-white p-8 rounded-lg shadow-md text-center">
-                <div className="text-5xl font-bold text-green-600 mb-2">100%</div>
-                <div className="text-xl text-gray-700 font-semibold">MUIS Certified</div>
-                <p className="text-gray-600 mt-2">Only verified halal certifications</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Values Section */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
-              Our Core Values
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Trust</h3>
-                <p className="text-gray-600">
-                  Every listing is verified against official MUIS certification records, ensuring complete reliability.
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Community</h3>
-                <p className="text-gray-600">
-                  Built by and for Singapore's Muslim community, with crowdsourced submissions to keep content current.
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Accessibility</h3>
-                <p className="text-gray-600">
-                  Fast, mobile-friendly, and easy to navigate - find what you need in seconds, anywhere in Singapore.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Team Section */}
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Our Team
-              </h2>
-              <p className="text-lg text-gray-700 mb-8">
-                Singapore Halal Directory is built and maintained by a passionate team of developers, designers,
-                and community advocates dedicated to serving Singapore's Muslim community.
-              </p>
-              <div className="bg-white p-8 rounded-lg shadow-md">
-                <p className="text-gray-600 mb-4">
-                  We combine cutting-edge technology with deep community understanding to create the most
-                  comprehensive and user-friendly halal business directory in Singapore.
-                </p>
-                <p className="text-gray-600">
-                  Have questions or want to join our mission? <Link href="/contact" className="text-green-600 font-semibold hover:text-green-700 underline">Get in touch</Link>.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-16 bg-gradient-to-br from-green-600 to-emerald-700 text-white">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Help Us Grow the Directory
-            </h2>
-            <p className="text-xl text-green-50 mb-8 max-w-2xl mx-auto">
-              Know a halal-certified business that's not listed? Submit it to help fellow Singaporeans discover great halal options.
+        <section className="text-center py-16 sm:py-24 px-4 sm:px-8 max-w-[960px] mx-auto">
+          <div className="flex flex-col gap-4">
+            <h1 className="text-[#343A40] text-4xl font-bold leading-tight tracking-tighter sm:text-5xl lg:text-6xl">
+              About the Singapore Halal Business Directory
+            </h1>
+            <p className="text-gray-500 text-lg sm:text-xl max-w-3xl mx-auto">
+              Your trusted guide to discovering and supporting Halal-certified businesses across the nation.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/submit-business"
-                className="bg-white text-green-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-green-50 transition-colors shadow-lg"
-              >
-                Submit a Business
-              </Link>
+          </div>
+          <div
+            className="mt-12 w-full bg-center bg-no-repeat aspect-[2/1] bg-cover rounded-xl"
+            style={{
+              backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCWxn1_GkH5pvN7NrI5jCtNlY7Y75gxmoFJjvrPXF-Bc27hFzfC1P_s5TRFI5kQaUZYK_RZJnEu2AaiMS1pbZSUJ6PCqRqMs19OURBDNYzY6siLgqrEmplcOEriqZjAZEhUt_wS1EYuy5x3ztMDGaugjoAA9i8kRRv13fOKnA_5dLsXHQi6Tg6Sx83CU84WueQpOgfiWUktz-0PEmGTAt7xTDWO7ZWOxuhnfcf6TtsnYG1JvdJzy3Se6FFPNG5lMj1Kc9TY_QldynM")',
+            }}
+          />
+        </section>
+
+        {/* Mission & Vision Section */}
+        <section className="py-16 sm:py-20 px-4 sm:px-8 max-w-[960px] mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+            <div className="flex flex-col gap-4">
+              <h2 className="text-[#343A40] text-3xl font-bold leading-tight">Our Mission</h2>
+              <p className="text-gray-500 text-base font-normal leading-relaxed">
+                To seamlessly connect the community with a comprehensive and trusted network of Halal-certified establishments in Singapore. We aim to empower consumers to make informed choices and support businesses that adhere to Halal principles with integrity and authenticity.
+              </p>
+            </div>
+            <div className="flex flex-col gap-4">
+              <h2 className="text-[#343A40] text-3xl font-bold leading-tight">Our Vision</h2>
+              <p className="text-gray-500 text-base font-normal leading-relaxed">
+                To be the most comprehensive and indispensable resource for Halal choices in Singapore, fostering a vibrant and accessible Halal ecosystem for everyone. We envision a future where finding trusted Halal options is effortless, strengthening community ties and celebrating our diverse culture.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Divider */}
+        <div className="max-w-[960px] mx-auto px-4 sm:px-8">
+          <div className="border-t border-gray-200 my-8"></div>
+        </div>
+
+        {/* Our Story Section */}
+        <section className="py-16 sm:py-20 text-center px-4 sm:px-8 max-w-[960px] mx-auto flex flex-col items-center">
+          <h2 className="text-[#343A40] text-3xl sm:text-4xl font-bold leading-tight">Our Story</h2>
+          <p className="text-gray-500 text-base font-normal leading-relaxed mt-4 max-w-3xl">
+            Founded by a passionate group of individuals from the heart of the community, the Singapore Halal Business Directory was born from a simple need: to make finding reliable Halal options easier for everyone. We saw the challenges faced by both consumers seeking authentic choices and businesses wanting to reach a wider audience. Our journey began with a commitment to build a platform based on trust, community, and accessibility, creating a bridge that celebrates Singapore's rich culinary heritage while upholding the principles of Halal.
+          </p>
+        </section>
+
+        {/* Our Values Section */}
+        <section className="py-16 sm:py-20 px-4 sm:px-8 max-w-[960px] mx-auto">
+          <h2 className="text-[#343A40] text-3xl sm:text-4xl font-bold leading-tight text-center">Our Core Values</h2>
+          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="flex flex-col items-center text-center gap-4 p-6 bg-white rounded-xl border border-gray-200">
+              <div className="flex items-center justify-center w-14 h-14 rounded-full bg-[#17cf73]/10 text-[#17cf73]">
+                <span className="material-symbols-outlined text-3xl">verified</span>
+              </div>
+              <h3 className="text-xl font-bold text-[#343A40]">Trust</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                We are committed to providing accurate and verified information to build unwavering confidence within our community.
+              </p>
+            </div>
+            <div className="flex flex-col items-center text-center gap-4 p-6 bg-white rounded-xl border border-gray-200">
+              <div className="flex items-center justify-center w-14 h-14 rounded-full bg-[#17cf73]/10 text-[#17cf73]">
+                <span className="material-symbols-outlined text-3xl">groups</span>
+              </div>
+              <h3 className="text-xl font-bold text-[#343A40]">Community</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                We strive to connect and support consumers and businesses, fostering a strong and vibrant Halal ecosystem.
+              </p>
+            </div>
+            <div className="flex flex-col items-center text-center gap-4 p-6 bg-white rounded-xl border border-gray-200">
+              <div className="flex items-center justify-center w-14 h-14 rounded-full bg-[#17cf73]/10 text-[#17cf73]">
+                <span className="material-symbols-outlined text-3xl">check_circle</span>
+              </div>
+              <h3 className="text-xl font-bold text-[#343A40]">Authenticity</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                We champion businesses that adhere to genuine Halal principles, ensuring peace of mind for all our users.
+              </p>
+            </div>
+            <div className="flex flex-col items-center text-center gap-4 p-6 bg-white rounded-xl border border-gray-200">
+              <div className="flex items-center justify-center w-14 h-14 rounded-full bg-[#17cf73]/10 text-[#17cf73]">
+                <span className="material-symbols-outlined text-3xl">accessibility_new</span>
+              </div>
+              <h3 className="text-xl font-bold text-[#343A40]">Accessibility</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                We believe finding Halal options should be simple and effortless for everyone, anytime and anywhere.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Call-to-Action Block */}
+        <section className="py-16 sm:py-20 px-4 sm:px-8 max-w-[960px] mx-auto">
+          <div className="bg-[#17cf73] text-white rounded-xl p-8 sm:p-12 flex flex-col lg:flex-row items-center justify-between gap-8 text-center lg:text-left">
+            <div className="flex flex-col gap-2">
+              <h2 className="text-3xl font-bold">Join Our Growing Community</h2>
+              <p className="text-white/80 max-w-xl">
+                Whether you're looking for your next meal or want to grow your business, our directory is here to help you connect.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto flex-shrink-0">
               <Link
                 href="/directory"
-                className="bg-green-800 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-green-900 transition-colors border-2 border-white"
+                className="flex min-w-[160px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-white text-[#17cf73] text-base font-bold leading-normal tracking-[0.015em] hover:bg-gray-50 transition-colors"
               >
-                Browse Directory
+                <span className="truncate">Search The Directory</span>
+              </Link>
+              <Link
+                href="/submit"
+                className="flex min-w-[160px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-[#FFC107] text-gray-900 text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#FFD54F] transition-colors"
+              >
+                <span className="truncate">List Your Business</span>
               </Link>
             </div>
           </div>
         </section>
       </div>
+
+      <Footer />
     </>
   );
 }

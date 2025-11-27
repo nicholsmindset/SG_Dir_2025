@@ -1,434 +1,581 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Advertise Your Business - Featured Listings | Singapore Halal Directory',
-  description: 'Boost your halal business visibility with featured listings. Get top placement, 8 images, and a blue verified badge for just $29/month. Stand out from 5,000+ businesses across Singapore.',
-  openGraph: {
-    title: 'Advertise Your Halal Business in Singapore',
-    description: 'Featured listings with premium placement starting at $29/month. Reach thousands of halal-conscious customers.',
+import { useState } from 'react';
+import Link from 'next/link';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+
+const adPackages = [
+  {
+    id: 'spotlight',
+    name: 'Homepage Spotlight',
+    price: 199,
+    period: '/week',
+    description: 'Premium placement on our homepage reaching 50K+ monthly visitors',
+    icon: 'star',
+    color: 'yellow',
+    features: [
+      'Featured position on homepage',
+      'Highlighted business card',
+      'Click-through to your listing',
+      'Performance analytics',
+      'Average 5,000+ impressions/week',
+    ],
   },
-};
+  {
+    id: 'banner',
+    name: 'Category Banner',
+    price: 149,
+    period: '/week',
+    description: 'Banner ad at the top of specific category pages',
+    icon: 'ad_group',
+    color: 'blue',
+    features: [
+      'Banner ad (728x90)',
+      'Choose target category',
+      'Link to your website',
+      'Impression tracking',
+      'Average 3,000+ views/week',
+    ],
+  },
+  {
+    id: 'featured',
+    name: 'Featured Listing',
+    price: 49,
+    period: '/week',
+    description: 'Boost your listing to the top of search results',
+    icon: 'trending_up',
+    color: 'green',
+    features: [
+      'Top of search results',
+      'Featured badge on listing',
+      'Priority in nearby searches',
+      'Click-through analytics',
+      'Average 2x more visibility',
+    ],
+  },
+  {
+    id: 'newsletter',
+    name: 'Newsletter Sponsor',
+    price: 299,
+    period: '/issue',
+    description: 'Reach our engaged subscriber base directly in their inbox',
+    icon: 'mail',
+    color: 'purple',
+    features: [
+      'Featured in weekly newsletter',
+      '15,000+ email subscribers',
+      'Dedicated section for your business',
+      'Include special offer or coupon',
+      'Average 35% open rate',
+    ],
+  },
+];
+
+const stats = [
+  { value: '50K+', label: 'Monthly Visitors' },
+  { value: '15K+', label: 'Newsletter Subscribers' },
+  { value: '5,000+', label: 'Listed Businesses' },
+  { value: '28', label: 'Districts Covered' },
+];
+
+const testimonials = [
+  {
+    quote: "The homepage spotlight brought us incredible visibility. We saw a 40% increase in walk-in customers that month.",
+    author: "Sarah Tan",
+    business: "Halal Bites Cafe",
+    location: "Tampines",
+  },
+  {
+    quote: "Newsletter sponsorship was perfect for our Ramadan promotion. The engagement was better than any other platform we've tried.",
+    author: "Irfan Abdullah",
+    business: "Rasa Sayang Restaurant",
+    location: "Geylang",
+  },
+  {
+    quote: "The featured listing doubled our online inquiries. Great ROI for a small business like ours.",
+    author: "Nurul Hassan",
+    business: "Sweet Treats Bakery",
+    location: "Jurong",
+  },
+];
 
 export default function AdvertisePage() {
-  const serviceSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Service',
-    serviceType: 'Featured Business Listing',
-    provider: {
-      '@type': 'Organization',
-      name: 'Singapore Halal Directory',
-    },
-    areaServed: {
-      '@type': 'Country',
-      name: 'Singapore',
-    },
-    description: 'Premium featured listings for halal-certified businesses with enhanced visibility and top placement',
+  const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    businessName: '',
+    contactName: '',
+    email: '',
+    phone: '',
+    website: '',
+    message: '',
+    budget: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  const offerSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Offer',
-    name: 'Featured Business Listing',
-    description: 'Premium placement with 8 images and enhanced visibility',
-    price: '29.00',
-    priceCurrency: 'SGD',
-    priceValidUntil: '2026-12-31',
-    availability: 'https://schema.org/InStock',
-    seller: {
-      '@type': 'Organization',
-      name: 'Singapore Halal Directory',
-    },
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setSubmitStatus('success');
+      setFormData({
+        businessName: '',
+        contactName: '',
+        email: '',
+        phone: '',
+        website: '',
+        message: '',
+        budget: '',
+      });
+      setSelectedPackage(null);
+    } catch {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const getColorClasses = (color: string) => {
+    const colors: Record<string, { bg: string; text: string; light: string }> = {
+      yellow: { bg: 'bg-yellow-500', text: 'text-yellow-600', light: 'bg-yellow-100' },
+      blue: { bg: 'bg-blue-500', text: 'text-blue-600', light: 'bg-blue-100' },
+      green: { bg: 'bg-[#17cf73]', text: 'text-[#17cf73]', light: 'bg-[#17cf73]/10' },
+      purple: { bg: 'bg-purple-500', text: 'text-purple-600', light: 'bg-purple-100' },
+    };
+    return colors[color] || colors.green;
   };
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(offerSchema) }}
-      />
+      <Header />
 
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-[#f6f8f7]">
         {/* Hero Section */}
-        <section className="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white py-20">
+        <section className="relative bg-gradient-to-br from-[#17cf73] via-emerald-500 to-teal-600 text-white py-20">
           <div className="absolute inset-0 bg-black opacity-10"></div>
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                Boost Your Business Visibility
+                Advertise With Us
               </h1>
-              <p className="text-xl md:text-2xl text-blue-50 leading-relaxed mb-8">
-                Stand out from thousands of listings with a featured placement
+              <p className="text-xl md:text-2xl text-green-50 mb-8">
+                Reach Singapore's Muslim community through the most trusted halal directory
               </p>
-              <Link
-                href="/upgrade/featured"
-                className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition-colors shadow-lg"
-              >
-                Upgrade Now
-              </Link>
+              <div className="flex flex-wrap justify-center gap-8">
+                {stats.map((stat, idx) => (
+                  <div key={idx} className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold">{stat.value}</div>
+                    <div className="text-green-100 text-sm">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Feature Comparison Section */}
+        {/* Ad Packages */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-[#343A40] mb-4">Advertising Packages</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Choose from our range of advertising options designed to help your halal business reach more customers
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+              {adPackages.map((pkg) => {
+                const colors = getColorClasses(pkg.color);
+                return (
+                  <div
+                    key={pkg.id}
+                    className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all cursor-pointer ${
+                      selectedPackage === pkg.id ? 'ring-2 ring-[#17cf73] shadow-lg' : 'hover:shadow-md'
+                    }`}
+                    onClick={() => setSelectedPackage(pkg.id)}
+                  >
+                    <div className={`${colors.bg} p-4 text-white`}>
+                      <span className="material-symbols-outlined text-3xl">{pkg.icon}</span>
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-lg font-bold text-[#343A40] mb-2">{pkg.name}</h3>
+                      <p className="text-gray-600 text-sm mb-4">{pkg.description}</p>
+                      <div className="mb-4">
+                        <span className="text-2xl font-bold text-[#343A40]">${pkg.price}</span>
+                        <span className="text-gray-500 text-sm">{pkg.period}</span>
+                      </div>
+                      <ul className="space-y-2 text-sm">
+                        {pkg.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <span className={`material-symbols-outlined text-sm ${colors.text}`}>check</span>
+                            <span className="text-gray-600">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="px-6 pb-6">
+                      <button
+                        className={`w-full py-2 rounded-lg font-semibold transition-colors ${
+                          selectedPackage === pkg.id
+                            ? 'bg-[#17cf73] text-white'
+                            : `${colors.light} ${colors.text} hover:opacity-80`
+                        }`}
+                      >
+                        {selectedPackage === pkg.id ? 'Selected' : 'Select Package'}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Why Advertise Section */}
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
-              Standard vs Featured Listings
-            </h2>
-            <div className="max-w-5xl mx-auto overflow-x-auto">
-              <table className="w-full border-collapse bg-white shadow-lg rounded-lg overflow-hidden">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Feature</th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">Standard (Free)</th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-blue-700 bg-blue-50">Featured (Paid)</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  <tr>
-                    <td className="px-6 py-4 text-gray-700 font-medium">Number of Images</td>
-                    <td className="px-6 py-4 text-center text-gray-600">1</td>
-                    <td className="px-6 py-4 text-center text-blue-600 font-semibold bg-blue-50">8</td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-gray-700 font-medium">Placement Priority</td>
-                    <td className="px-6 py-4 text-center text-gray-600">Regular</td>
-                    <td className="px-6 py-4 text-center text-blue-600 font-semibold bg-blue-50">Top of Results</td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-gray-700 font-medium">Featured Badge</td>
-                    <td className="px-6 py-4 text-center text-gray-400">
-                      <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </td>
-                    <td className="px-6 py-4 text-center bg-blue-50">
-                      <svg className="w-6 h-6 text-blue-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-gray-700 font-medium">Blue Border Highlight</td>
-                    <td className="px-6 py-4 text-center text-gray-400">
-                      <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </td>
-                    <td className="px-6 py-4 text-center bg-blue-50">
-                      <svg className="w-6 h-6 text-blue-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-gray-700 font-medium">Image Gallery/Carousel</td>
-                    <td className="px-6 py-4 text-center text-gray-400">
-                      <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </td>
-                    <td className="px-6 py-4 text-center bg-blue-50">
-                      <svg className="w-6 h-6 text-blue-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-gray-700 font-medium">Visibility Boost</td>
-                    <td className="px-6 py-4 text-center text-gray-600">Standard</td>
-                    <td className="px-6 py-4 text-center text-blue-600 font-semibold bg-blue-50">5-10x Higher</td>
-                  </tr>
-                  <tr className="bg-gray-50">
-                    <td className="px-6 py-4 text-gray-700 font-medium">Cost</td>
-                    <td className="px-6 py-4 text-center text-gray-600 font-bold">FREE</td>
-                    <td className="px-6 py-4 text-center text-blue-600 font-bold text-lg bg-blue-50">From $29/month</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div className="max-w-6xl mx-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                  <h2 className="text-3xl font-bold text-[#343A40] mb-6">Why Advertise on HalalSG?</h2>
+                  <div className="space-y-6">
+                    <div className="flex gap-4">
+                      <div className="w-12 h-12 bg-[#17cf73]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="material-symbols-outlined text-[#17cf73]">groups</span>
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-[#343A40] mb-1">Targeted Audience</h3>
+                        <p className="text-gray-600 text-sm">
+                          Reach Singapore's Muslim community actively searching for halal businesses and services.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-4">
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="material-symbols-outlined text-blue-600">verified</span>
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-[#343A40] mb-1">Trusted Platform</h3>
+                        <p className="text-gray-600 text-sm">
+                          We're the go-to resource for MUIS-certified halal businesses, building trust with your audience.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-4">
+                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="material-symbols-outlined text-purple-600">analytics</span>
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-[#343A40] mb-1">Measurable Results</h3>
+                        <p className="text-gray-600 text-sm">
+                          Track impressions, clicks, and conversions with our detailed analytics dashboard.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-4">
+                      <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="material-symbols-outlined text-orange-600">support_agent</span>
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-[#343A40] mb-1">Dedicated Support</h3>
+                        <p className="text-gray-600 text-sm">
+                          Our team helps optimize your campaigns for maximum impact and ROI.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-[#17cf73] to-emerald-600 rounded-2xl p-8 text-white">
+                  <h3 className="text-2xl font-bold mb-6">Audience Demographics</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span>Age 25-44</span>
+                        <span className="font-bold">65%</span>
+                      </div>
+                      <div className="h-2 bg-white/20 rounded-full">
+                        <div className="h-2 bg-white rounded-full" style={{ width: '65%' }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span>Mobile Users</span>
+                        <span className="font-bold">78%</span>
+                      </div>
+                      <div className="h-2 bg-white/20 rounded-full">
+                        <div className="h-2 bg-white rounded-full" style={{ width: '78%' }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span>Return Visitors</span>
+                        <span className="font-bold">45%</span>
+                      </div>
+                      <div className="h-2 bg-white/20 rounded-full">
+                        <div className="h-2 bg-white rounded-full" style={{ width: '45%' }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span>Average Session</span>
+                        <span className="font-bold">4.5 min</span>
+                      </div>
+                      <div className="h-2 bg-white/20 rounded-full">
+                        <div className="h-2 bg-white rounded-full" style={{ width: '60%' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-6 pt-6 border-t border-white/20">
+                    <p className="text-green-50 text-sm">
+                      Our audience actively seeks halal businesses, making them highly engaged and ready to convert.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Pricing Section */}
-        <section className="py-16 bg-gray-50">
+        {/* Testimonials */}
+        <section className="py-16">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 text-center">
-              Simple, Transparent Pricing
-            </h2>
-            <p className="text-xl text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-              One-time payment. No subscriptions. Cancel anytime.
-            </p>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-[#343A40] mb-4">Success Stories</h2>
+              <p className="text-gray-600">Hear from businesses that have advertised with us</p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {/* 1 Month */}
-              <div className="bg-white p-8 rounded-lg shadow-md border-2 border-gray-200">
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">1 Month</h3>
-                  <div className="text-4xl font-bold text-blue-600 mb-4">$29</div>
-                  <p className="text-gray-600 mb-6">Best for testing featured placement</p>
-                  <Link
-                    href="/upgrade/featured?plan=1month"
-                    className="block w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-                  >
-                    Get Started
-                  </Link>
+              {testimonials.map((testimonial, idx) => (
+                <div key={idx} className="bg-white rounded-xl shadow-sm p-6">
+                  <span className="material-symbols-outlined text-[#17cf73] text-3xl mb-4">format_quote</span>
+                  <p className="text-gray-600 mb-6">{testimonial.quote}</p>
+                  <div>
+                    <p className="font-bold text-[#343A40]">{testimonial.author}</p>
+                    <p className="text-sm text-gray-500">{testimonial.business}</p>
+                    <p className="text-sm text-[#17cf73]">{testimonial.location}</p>
+                  </div>
                 </div>
-              </div>
-
-              {/* 3 Months - Popular */}
-              <div className="bg-white p-8 rounded-lg shadow-lg border-4 border-blue-500 relative">
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                  MOST POPULAR
-                </div>
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">3 Months</h3>
-                  <div className="text-4xl font-bold text-blue-600 mb-2">$75</div>
-                  <div className="text-sm text-green-600 font-semibold mb-4">Save $12 (14%)</div>
-                  <p className="text-gray-600 mb-6">Best value for consistent visibility</p>
-                  <Link
-                    href="/upgrade/featured?plan=3months"
-                    className="block w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-                  >
-                    Get Started
-                  </Link>
-                </div>
-              </div>
-
-              {/* 6 Months */}
-              <div className="bg-white p-8 rounded-lg shadow-md border-2 border-gray-200">
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">6 Months</h3>
-                  <div className="text-4xl font-bold text-blue-600 mb-2">$140</div>
-                  <div className="text-sm text-green-600 font-semibold mb-4">Save $34 (20%)</div>
-                  <p className="text-gray-600 mb-6">Maximum savings and exposure</p>
-                  <Link
-                    href="/upgrade/featured?plan=6months"
-                    className="block w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-                  >
-                    Get Started
-                  </Link>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Benefits Section */}
-        <section className="py-16 bg-white">
+        {/* Contact Form */}
+        <section className="py-16 bg-white" id="contact-form">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
-              Why Choose Featured Listings?
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 mb-1">Top Placement</h3>
-                  <p className="text-gray-600">Appear first in area searches, above all standard listings</p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 mb-1">Showcase Your Best</h3>
-                  <p className="text-gray-600">8 high-quality images vs 1 for standard listings</p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 mb-1">Stand Out Visually</h3>
-                  <p className="text-gray-600">Blue border and "Featured" badge for instant recognition</p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 mb-1">5-10x More Visibility</h3>
-                  <p className="text-gray-600">Featured listings receive significantly more views and clicks</p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 mb-1">Affordable Investment</h3>
-                  <p className="text-gray-600">Starting at less than $1/day with no long-term contracts</p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 mb-1">Targeted Audience</h3>
-                  <p className="text-gray-600">Reach halal-conscious customers actively searching in your area</p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 mb-1">Full Control</h3>
-                  <p className="text-gray-600">Update images and info anytime through your dashboard</p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 mb-1">Instant Activation</h3>
-                  <p className="text-gray-600">Your featured listing goes live immediately after payment</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Badge Program Section */}
-        <section className="py-16 bg-gradient-to-br from-amber-50 to-yellow-50 border-y-4 border-amber-200">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="inline-block bg-amber-500 text-white px-4 py-2 rounded-full font-semibold mb-6">
-                FREE FEATURED MONTH
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Badge Program: Get 1 Free Featured Month
-              </h2>
-              <p className="text-xl text-gray-700 mb-8">
-                Add our badge to your website and earn a free month of featured listing (a $29 value!)
-              </p>
-              <div className="bg-white p-8 rounded-lg shadow-md text-left mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">How It Works:</h3>
-                <ol className="space-y-4 text-gray-700">
-                  <li className="flex items-start space-x-3">
-                    <span className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">1</span>
-                    <span>Generate your unique badge code from our <Link href="/badge-generator" className="text-blue-600 hover:text-blue-700 underline">Badge Generator</Link></span>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <span className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">2</span>
-                    <span>Add the HTML badge or anchor text link to your website</span>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <span className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">3</span>
-                    <span>We verify the backlink is live on your site</span>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <span className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">4</span>
-                    <span>Receive 1 free month of featured listing automatically</span>
-                  </li>
-                </ol>
-              </div>
-              <Link
-                href="/badge-generator"
-                className="inline-block bg-amber-500 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-amber-600 transition-colors shadow-lg"
-              >
-                Generate Your Badge Now
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Success Metrics Section */}
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
-              Real Results from Featured Businesses
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              <div className="bg-white p-8 rounded-lg shadow-md">
-                <div className="text-5xl font-bold text-blue-600 mb-2">8.5x</div>
-                <div className="text-xl text-gray-700 font-semibold mb-2">More Profile Views</div>
-                <p className="text-gray-600">Featured listings receive significantly more visibility</p>
-              </div>
-              <div className="bg-white p-8 rounded-lg shadow-md">
-                <div className="text-5xl font-bold text-blue-600 mb-2">12x</div>
-                <div className="text-xl text-gray-700 font-semibold mb-2">Higher Click-Through Rate</div>
-                <p className="text-gray-600">Top placement drives more engagement</p>
-              </div>
-              <div className="bg-white p-8 rounded-lg shadow-md">
-                <div className="text-5xl font-bold text-blue-600 mb-2">6x</div>
-                <div className="text-xl text-gray-700 font-semibold mb-2">More Customer Inquiries</div>
-                <p className="text-gray-600">Featured businesses get more phone calls and visits</p>
-              </div>
-            </div>
-            <div className="mt-12 max-w-4xl mx-auto">
-              <div className="bg-white p-8 rounded-lg shadow-md border-l-4 border-blue-500">
-                <p className="text-gray-700 italic text-lg mb-4">
-                  "Since upgrading to a featured listing, our foot traffic has increased by 40%. The 8 images let us showcase our menu and ambiance properly. Best $75 we've spent on marketing."
+            <div className="max-w-3xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-[#343A40] mb-4">Get Started</h2>
+                <p className="text-gray-600">
+                  Fill out the form below and our advertising team will contact you within 24 hours
                 </p>
-                <p className="text-gray-900 font-semibold">— Halal Restaurant Owner, Bugis</p>
+              </div>
+              <div className="bg-[#f6f8f7] rounded-xl p-6 md:p-8">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="businessName" className="block text-sm font-medium text-[#343A40] mb-2">
+                        Business Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="businessName"
+                        name="businessName"
+                        value={formData.businessName}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#17cf73] focus:border-transparent"
+                        placeholder="Your business name"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="contactName" className="block text-sm font-medium text-[#343A40] mb-2">
+                        Contact Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="contactName"
+                        name="contactName"
+                        value={formData.contactName}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#17cf73] focus:border-transparent"
+                        placeholder="Your name"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-[#343A40] mb-2">
+                        Email <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#17cf73] focus:border-transparent"
+                        placeholder="email@example.com"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="phone" className="block text-sm font-medium text-[#343A40] mb-2">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#17cf73] focus:border-transparent"
+                        placeholder="+65 9123 4567"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="website" className="block text-sm font-medium text-[#343A40] mb-2">
+                        Website (if any)
+                      </label>
+                      <input
+                        type="url"
+                        id="website"
+                        name="website"
+                        value={formData.website}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#17cf73] focus:border-transparent"
+                        placeholder="https://yourbusiness.com"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="budget" className="block text-sm font-medium text-[#343A40] mb-2">
+                        Monthly Budget <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        id="budget"
+                        name="budget"
+                        value={formData.budget}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#17cf73] focus:border-transparent"
+                      >
+                        <option value="">Select budget range</option>
+                        <option value="under-200">Under $200</option>
+                        <option value="200-500">$200 - $500</option>
+                        <option value="500-1000">$500 - $1,000</option>
+                        <option value="1000-plus">$1,000+</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {selectedPackage && (
+                    <div className="bg-[#17cf73]/10 border border-[#17cf73]/20 rounded-lg p-4">
+                      <div className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[#17cf73]">check_circle</span>
+                        <span className="font-medium text-[#343A40]">
+                          Selected Package: {adPackages.find(p => p.id === selectedPackage)?.name}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium text-[#343A40] mb-2">
+                      Tell us about your advertising goals
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      rows={4}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#17cf73] focus:border-transparent resize-none"
+                      placeholder="What are you hoping to achieve with advertising? Any specific campaigns or promotions?"
+                    />
+                  </div>
+
+                  {submitStatus === 'success' && (
+                    <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
+                      <span className="material-symbols-outlined">check_circle</span>
+                      Thank you! Our advertising team will contact you within 24 hours.
+                    </div>
+                  )}
+
+                  {submitStatus === 'error' && (
+                    <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+                      <span className="material-symbols-outlined">error</span>
+                      Something went wrong. Please try again or email us at ads@halalsg.com
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full flex items-center justify-center gap-2 bg-[#17cf73] text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-[#13ec80] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <span className="material-symbols-outlined animate-spin">progress_activity</span>
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined">send</span>
+                        Submit Inquiry
+                      </>
+                    )}
+                  </button>
+                </form>
               </div>
             </div>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="py-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
+        <section className="py-16 bg-gradient-to-br from-[#17cf73] to-emerald-600 text-white">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Ready to Boost Your Visibility?
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Ready to Reach More Customers?
             </h2>
-            <p className="text-xl text-blue-50 mb-8 max-w-2xl mx-auto">
-              Join hundreds of featured businesses across Singapore. Upgrade today and start attracting more customers.
+            <p className="text-xl text-green-50 mb-8 max-w-2xl mx-auto">
+              Start advertising today and connect with Singapore's growing Muslim community.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/upgrade/featured"
-                className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition-colors shadow-lg"
+              <a
+                href="#contact-form"
+                className="inline-flex items-center justify-center gap-2 bg-white text-[#17cf73] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-green-50 transition-colors shadow-lg"
               >
-                Upgrade to Featured
-              </Link>
+                <span className="material-symbols-outlined">campaign</span>
+                Start Advertising
+              </a>
               <Link
                 href="/contact"
-                className="bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-900 transition-colors border-2 border-white"
+                className="inline-flex items-center justify-center gap-2 bg-white/10 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white/20 transition-colors border-2 border-white/30"
               >
+                <span className="material-symbols-outlined">call</span>
                 Contact Sales
               </Link>
             </div>
           </div>
         </section>
       </div>
+
+      <Footer />
     </>
   );
 }

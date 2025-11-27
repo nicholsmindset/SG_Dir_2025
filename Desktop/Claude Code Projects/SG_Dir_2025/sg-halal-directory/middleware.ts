@@ -1,8 +1,13 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { updateSession } from '@/utils/supabase/middleware'
-import { createClient } from '@/utils/supabase/server'
+// import { updateSession } from '@/utils/supabase/middleware'
+// import { createClient } from '@/utils/supabase/server'
 
 export async function middleware(request: NextRequest) {
+  // TEMPORARY: Bypass Supabase for design preview
+  // TODO: Re-enable Supabase auth when ready
+  return NextResponse.next()
+
+  /* ORIGINAL CODE - Re-enable when Supabase is configured
   // Define protected paths that require authentication
   const protectedPaths = ['/dashboard']
   const path = request.nextUrl.pathname
@@ -27,6 +32,7 @@ export async function middleware(request: NextRequest) {
 
   // Continue with session update for all requests
   return await updateSession(request)
+  */
 }
 
 export const config = {
