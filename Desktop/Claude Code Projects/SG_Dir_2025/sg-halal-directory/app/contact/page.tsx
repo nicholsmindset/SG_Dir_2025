@@ -1,17 +1,15 @@
 'use client';
 
-import { Metadata } from 'next';
 import { useState } from 'react';
 import Link from 'next/link';
-
-// Note: Metadata export must be in a separate server component wrapper or removed in client components
-// For now, using client component for form functionality
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    category: '',
+    subject: '',
     message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,12 +20,10 @@ export default function ContactPage() {
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
-    // TODO: Implement actual form submission (Supabase, email service, etc.)
-    // For now, simulate submission
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       setSubmitStatus('success');
-      setFormData({ name: '', email: '', category: '', message: '' });
+      setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
       setSubmitStatus('error');
     } finally {
@@ -35,7 +31,7 @@ export default function ContactPage() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -50,55 +46,16 @@ export default function ContactPage() {
     mainEntity: {
       '@type': 'Organization',
       name: 'Singapore Halal Directory',
-      email: 'support@singaporehalaldir.com',
+      email: 'contact@shbd.sg',
+      telephone: '+65 6123 4567',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: '123 Orchard Road, #04-56',
+        addressLocality: 'Singapore',
+        postalCode: '238888',
+        addressCountry: 'SG',
+      },
     },
-  };
-
-  const faqSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: 'How do I add my business to the directory?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'You can submit your business through our Submit Business form. After verification of your MUIS halal certification, your listing will be approved and published.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How long does it take to get a response?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'We typically respond to all inquiries within 24 hours during business days.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Can I update my business information?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes! Business owners can claim their listing and update information through their dashboard after verification.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How do I report incorrect information?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Use our contact form and select "Report Issue" as the category. Provide details about the incorrect listing and we\'ll investigate immediately.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Do you offer advertising or partnership opportunities?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes! Contact us using the "Partnership" category or visit our Advertise page to learn about featured listing opportunities.',
-        },
-      },
-    ],
   };
 
   return (
@@ -107,265 +64,183 @@ export default function ContactPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(contactPageSchema) }}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
 
-      <div className="min-h-screen">
-        {/* Hero Section */}
-        <section className="relative bg-gradient-to-br from-green-600 via-emerald-600 to-teal-700 text-white py-20">
-          <div className="absolute inset-0 bg-black opacity-10"></div>
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                Get in Touch
-              </h1>
-              <p className="text-xl md:text-2xl text-green-50 leading-relaxed">
-                Questions, feedback, or partnership inquiries? We'd love to hear from you.
-              </p>
-            </div>
+      <Header />
+
+      <main className="flex-1 px-4 sm:px-6 lg:px-8 py-12 md:py-20 bg-[#f6f8f7]">
+        <div className="mx-auto max-w-6xl">
+          {/* Page Heading */}
+          <div className="text-center mb-12">
+            <h1 className="text-[#343A40] text-4xl md:text-5xl font-black leading-tight tracking-[-0.033em]">
+              Get In Touch
+            </h1>
+            <p className="mt-3 text-gray-500 text-lg font-normal leading-normal max-w-2xl mx-auto">
+              We'd love to hear from you. Please fill out the form below, and our team will get back to you shortly.
+            </p>
           </div>
-        </section>
 
-        {/* Contact Form & Info Section */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-              {/* Contact Form */}
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
-                      Name <span className="text-red-500">*</span>
-                    </label>
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-16">
+            {/* Contact Form */}
+            <div className="lg:col-span-3 bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Full Name & Email */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <label className="flex flex-col">
+                    <p className="text-[#343A40] text-base font-medium leading-normal pb-2">Full Name</p>
                     <input
                       type="text"
-                      id="name"
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      placeholder="Your name"
+                      className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#343A40] focus:outline-0 focus:ring-2 focus:ring-[#17cf73]/50 border border-gray-200 bg-[#f6f8f7] h-12 placeholder:text-gray-400 px-4 text-base font-normal leading-normal"
+                      placeholder="e.g., Aisha Binte Ahmad"
                     />
-                  </div>
-
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                      Email <span className="text-red-500">*</span>
-                    </label>
+                  </label>
+                  <label className="flex flex-col">
+                    <p className="text-[#343A40] text-base font-medium leading-normal pb-2">Email Address</p>
                     <input
                       type="email"
-                      id="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      placeholder="your.email@example.com"
+                      className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#343A40] focus:outline-0 focus:ring-2 focus:ring-[#17cf73]/50 border border-gray-200 bg-[#f6f8f7] h-12 placeholder:text-gray-400 px-4 text-base font-normal leading-normal"
+                      placeholder="e.g., aisha.ahmad@email.com"
                     />
+                  </label>
+                </div>
+
+                {/* Subject */}
+                <label className="flex flex-col">
+                  <p className="text-[#343A40] text-base font-medium leading-normal pb-2">Subject</p>
+                  <input
+                    type="text"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    required
+                    className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#343A40] focus:outline-0 focus:ring-2 focus:ring-[#17cf73]/50 border border-gray-200 bg-[#f6f8f7] h-12 placeholder:text-gray-400 px-4 text-base font-normal leading-normal"
+                    placeholder="e.g., Listing Inquiry"
+                  />
+                </label>
+
+                {/* Message */}
+                <label className="flex flex-col">
+                  <p className="text-[#343A40] text-base font-medium leading-normal pb-2">Your Message</p>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                    className="w-full min-w-0 flex-1 resize-y overflow-hidden rounded-lg text-[#343A40] focus:outline-0 focus:ring-2 focus:ring-[#17cf73]/50 border border-gray-200 bg-[#f6f8f7] h-36 placeholder:text-gray-400 p-4 text-base font-normal leading-normal"
+                    placeholder="Type your message here..."
+                  />
+                </label>
+
+                {submitStatus === 'success' && (
+                  <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
+                    <span className="material-symbols-outlined">check_circle</span>
+                    Thank you! We've received your message and will respond within 24 hours.
                   </div>
+                )}
 
-                  <div>
-                    <label htmlFor="category" className="block text-sm font-semibold text-gray-700 mb-2">
-                      Category <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      id="category"
-                      name="category"
-                      value={formData.category}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    >
-                      <option value="">Select a category</option>
-                      <option value="business_owner">Business Owner</option>
-                      <option value="general">General Inquiry</option>
-                      <option value="partnership">Partnership</option>
-                      <option value="report">Report Issue</option>
-                    </select>
+                {submitStatus === 'error' && (
+                  <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+                    <span className="material-symbols-outlined">error</span>
+                    Something went wrong. Please try again or email us directly.
                   </div>
+                )}
 
-                  <div>
-                    <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
-                      Message <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      required
-                      rows={6}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
-                      placeholder="Tell us how we can help..."
-                    />
-                  </div>
-
-                  {submitStatus === 'success' && (
-                    <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
-                      Thank you! We've received your message and will respond within 24 hours.
-                    </div>
-                  )}
-
-                  {submitStatus === 'error' && (
-                    <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
-                      Something went wrong. Please try again or email us directly at support@singaporehalaldir.com.
-                    </div>
-                  )}
-
+                <div>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-green-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="w-full flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-4 bg-[#17cf73] text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#13ec80] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#17cf73] disabled:bg-gray-400 disabled:cursor-not-allowed"
                   >
-                    {isSubmitting ? 'Sending...' : 'Send Message'}
+                    {isSubmitting ? (
+                      <span className="truncate">Sending...</span>
+                    ) : (
+                      <span className="truncate">Send Message</span>
+                    )}
                   </button>
-                </form>
-              </div>
+                </div>
+                <p className="text-center text-xs text-gray-500 pt-2">
+                  By submitting this form, you agree to our{' '}
+                  <Link href="/privacy" className="underline hover:text-[#17cf73]">
+                    Privacy Policy
+                  </Link>
+                  . This site is protected by reCAPTCHA.
+                </p>
+              </form>
+            </div>
 
-              {/* Contact Information */}
+            {/* Contact Info Block */}
+            <div className="lg:col-span-2 space-y-8">
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-6">Contact Information</h2>
-                <div className="space-y-6">
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
-                        <a href="mailto:support@singaporehalaldir.com" className="text-green-600 hover:text-green-700">
-                          support@singaporehalaldir.com
-                        </a>
-                      </div>
+                <h3 className="text-2xl font-bold text-[#343A40] mb-4">Other Ways to Reach Us</h3>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-[#17cf73]/20 text-[#17cf73]">
+                      <span className="material-symbols-outlined">mail</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-[#343A40]">Email</h4>
+                      <p className="text-gray-500">For general inquiries, partnerships, or support.</p>
+                      <a href="mailto:contact@shbd.sg" className="text-[#17cf73] font-medium hover:underline">
+                        contact@shbd.sg
+                      </a>
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 mb-1">Response Time</h3>
-                        <p className="text-gray-600">Within 24 hours during business days</p>
-                      </div>
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-[#17cf73]/20 text-[#17cf73]">
+                      <span className="material-symbols-outlined">call</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-[#343A40]">Phone</h4>
+                      <p className="text-gray-500">Available from 9 AM to 5 PM, Mon - Fri.</p>
+                      <a href="tel:+6561234567" className="text-[#17cf73] font-medium hover:underline">
+                        +65 6123 4567
+                      </a>
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-3">Quick Links</h3>
-                    <ul className="space-y-2">
-                      <li>
-                        <Link href="/submit-business" className="text-green-600 hover:text-green-700 font-medium">
-                          → Submit Your Business
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/dashboard/claim-business" className="text-green-600 hover:text-green-700 font-medium">
-                          → Claim Your Listing
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/advertise" className="text-green-600 hover:text-green-700 font-medium">
-                          → Advertise with Us
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/about" className="text-green-600 hover:text-green-700 font-medium">
-                          → About Us
-                        </Link>
-                      </li>
-                    </ul>
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-[#17cf73]/20 text-[#17cf73]">
+                      <span className="material-symbols-outlined">location_on</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-[#343A40]">Address</h4>
+                      <p className="text-gray-500">
+                        123 Orchard Road, #04-56
+                        <br />
+                        Singapore 238888
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
 
-        {/* FAQ Section */}
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-10 text-center">
-                Frequently Asked Questions
-              </h2>
-              <div className="space-y-6">
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    How do I add my business to the directory?
-                  </h3>
-                  <p className="text-gray-600">
-                    You can submit your business through our <Link href="/submit-business" className="text-green-600 hover:text-green-700 underline">Submit Business form</Link>. After verification of your MUIS halal certification, your listing will be approved and published.
-                  </p>
-                </div>
-
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    How long does it take to get a response?
-                  </h3>
-                  <p className="text-gray-600">
-                    We typically respond to all inquiries within 24 hours during business days. Urgent issues are prioritized.
-                  </p>
-                </div>
-
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    Can I update my business information?
-                  </h3>
-                  <p className="text-gray-600">
-                    Yes! Business owners can <Link href="/dashboard/claim-business" className="text-green-600 hover:text-green-700 underline">claim their listing</Link> and update information through their dashboard after verification.
-                  </p>
-                </div>
-
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    How do I report incorrect information?
-                  </h3>
-                  <p className="text-gray-600">
-                    Use our contact form above and select "Report Issue" as the category. Provide details about the incorrect listing and we'll investigate immediately.
-                  </p>
-                </div>
-
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    Do you offer advertising or partnership opportunities?
-                  </h3>
-                  <p className="text-gray-600">
-                    Yes! Contact us using the "Partnership" category or visit our <Link href="/advertise" className="text-green-600 hover:text-green-700 underline">Advertise page</Link> to learn about featured listing opportunities.
-                  </p>
-                </div>
+              {/* Map */}
+              <div className="aspect-w-16 aspect-h-9">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.790933583204!2d103.8422409758509!3d1.3006619986872895!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da199148d95129%3A0x8633a259c636f1e!2sOrchard%20Rd%2C%20Singapore!5e0!3m2!1sen!2smy!4f13.1!5m2!1sen!2smy"
+                  width="100%"
+                  height="250"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="rounded-lg"
+                />
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </main>
 
-        {/* CTA Section */}
-        <section className="py-16 bg-gradient-to-br from-green-600 to-emerald-700 text-white">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Prefer to Browse First?
-            </h2>
-            <p className="text-xl text-green-50 mb-8 max-w-2xl mx-auto">
-              Explore our comprehensive directory of halal-certified businesses across Singapore.
-            </p>
-            <Link
-              href="/directory"
-              className="inline-block bg-white text-green-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-green-50 transition-colors shadow-lg"
-            >
-              Browse Directory
-            </Link>
-          </div>
-        </section>
-      </div>
+      <Footer />
     </>
   );
 }

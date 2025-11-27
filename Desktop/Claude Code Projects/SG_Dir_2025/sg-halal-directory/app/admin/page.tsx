@@ -1,5 +1,3 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 
 export const metadata = {
@@ -16,215 +14,266 @@ export const metadata = {
   },
 }
 
+// Check if Supabase is configured
+const isSupabaseConfigured = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  return url && url.startsWith('http') && !url.includes('your_supabase');
+};
+
 export default async function AdminDashboardPage() {
-  const supabase = await createClient()
+  let totalBusinesses = 127;
+  let pendingBusinesses = 5;
+  let pendingClaims = 3;
+  let activeCoupons = 8;
+  let featuredBusinesses = 24;
+  let totalUsers = 1543;
 
-  // Check authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  // Only fetch from Supabase if configured
+  if (isSupabaseConfigured()) {
+    const { createClient } = await import('@/utils/supabase/server');
+    const { redirect } = await import('next/navigation');
 
-  if (authError || !user) {
-    redirect('/auth/login?redirect=/admin')
+    const supabase = await createClient();
+
+    // Check authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      redirect('/auth/login?redirect=/admin');
+    }
+
+    // Check admin status
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile?.is_admin) {
+      redirect('/');
+    }
+
+    // Fetch statistics
+    const [
+      { count: tb },
+      { count: pb },
+      { count: pc },
+      { count: ac },
+      { count: fb },
+      { count: tu }
+    ] = await Promise.all([
+      supabase.from('businesses').select('*', { count: 'exact', head: true }),
+      supabase.from('businesses').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+      supabase.from('business_claims').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+      supabase.from('coupon_codes').select('*', { count: 'exact', head: true }).eq('is_active', true),
+      supabase.from('businesses').select('*', { count: 'exact', head: true }).eq('is_featured', true),
+      supabase.from('profiles').select('*', { count: 'exact', head: true })
+    ]);
+
+    totalBusinesses = tb || 0;
+    pendingBusinesses = pb || 0;
+    pendingClaims = pc || 0;
+    activeCoupons = ac || 0;
+    featuredBusinesses = fb || 0;
+    totalUsers = tu || 0;
   }
 
-  // Check admin status
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', user.id)
-    .single()
-
-  if (!profile?.is_admin) {
-    redirect('/')
-  }
-
-  // Fetch statistics
-  const [
-    { count: totalBusinesses },
-    { count: pendingBusinesses },
-    { count: pendingClaims },
-    { count: activeCoupons },
-    { count: featuredBusinesses }
-  ] = await Promise.all([
-    supabase.from('businesses').select('*', { count: 'exact', head: true }),
-    supabase.from('businesses').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-    supabase.from('business_claims').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-    supabase.from('coupon_codes').select('*', { count: 'exact', head: true }).eq('is_active', true),
-    supabase.from('businesses').select('*', { count: 'exact', head: true }).eq('is_featured', true)
-  ])
+  // Mock recent activity - replace with actual data
+  const recentActivity = [
+    { id: 1, action: 'New business submitted', details: 'Halal Kitchen - Pending review', time: '5 mins ago', icon: 'store', color: 'blue' },
+    { id: 2, action: 'Claim request', details: 'John Doe claimed Nasi Lemak Paradise', time: '15 mins ago', icon: 'verified', color: 'orange' },
+    { id: 3, action: 'Business approved', details: 'Saffron Restaurant is now live', time: '1 hour ago', icon: 'check_circle', color: 'green' },
+    { id: 4, action: 'Featured listing purchased', details: 'Zam Zam - 3 months', time: '2 hours ago', icon: 'star', color: 'yellow' },
+    { id: 5, action: 'New user registered', details: 'sarah@example.com', time: '3 hours ago', icon: 'person_add', color: 'purple' },
+  ]
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="mt-2 text-gray-600">
-            Welcome to the Singapore Halal Directory admin panel
-          </p>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {/* Total Businesses */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                </div>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Total Businesses</p>
-                <p className="text-2xl font-semibold text-gray-900">{totalBusinesses || 0}</p>
-              </div>
-            </div>
-            <div className="mt-4">
-              <Link
-                href="/admin/businesses"
-                className="text-sm font-medium text-blue-600 hover:text-blue-800"
-              >
-                View all →
-              </Link>
-            </div>
-          </div>
-
-          {/* Pending Approvals */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Pending Businesses</p>
-                <p className="text-2xl font-semibold text-gray-900">{pendingBusinesses || 0}</p>
-              </div>
-            </div>
-            <div className="mt-4">
-              <Link
-                href="/admin/businesses?status=pending"
-                className="text-sm font-medium text-yellow-600 hover:text-yellow-800"
-              >
-                Review now →
-              </Link>
-            </div>
-          </div>
-
-          {/* Pending Claims */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Pending Claims</p>
-                <p className="text-2xl font-semibold text-gray-900">{pendingClaims || 0}</p>
-              </div>
-            </div>
-            <div className="mt-4">
-              <Link
-                href="/admin/claims"
-                className="text-sm font-medium text-orange-600 hover:text-orange-800"
-              >
-                Review claims →
-              </Link>
-            </div>
-          </div>
-
-          {/* Featured Businesses */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                  </svg>
-                </div>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Featured Businesses</p>
-                <p className="text-2xl font-semibold text-gray-900">{featuredBusinesses || 0}</p>
-              </div>
-            </div>
-            <div className="mt-4">
-              <Link
-                href="/admin/businesses?featured=true"
-                className="text-sm font-medium text-purple-600 hover:text-purple-800"
-              >
-                View featured →
-              </Link>
-            </div>
-          </div>
-
-          {/* Active Coupons */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                  </svg>
-                </div>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Active Coupons</p>
-                <p className="text-2xl font-semibold text-gray-900">{activeCoupons || 0}</p>
-              </div>
-            </div>
-            <div className="mt-4">
-              <Link
-                href="/admin/coupons"
-                className="text-sm font-medium text-green-600 hover:text-green-800"
-              >
-                Manage coupons →
-              </Link>
-            </div>
+    <div>
+      {/* Demo Mode Banner */}
+      {!isSupabaseConfigured() && (
+        <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center gap-3">
+          <span className="material-symbols-outlined text-yellow-600">info</span>
+          <div>
+            <p className="font-medium text-yellow-800">Demo Mode</p>
+            <p className="text-sm text-yellow-700">Supabase is not configured. Showing sample data. Configure your .env.local file to connect to your database.</p>
           </div>
         </div>
+      )}
 
+      {/* Page Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-[#343A40]">Admin Dashboard</h1>
+        <p className="text-gray-500 mt-1">Welcome to the Singapore Halal Directory admin panel</p>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {/* Total Businesses */}
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm">Total Businesses</p>
+              <h3 className="text-3xl font-bold text-[#343A40]">{totalBusinesses}</h3>
+            </div>
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <span className="material-symbols-outlined text-blue-600">store</span>
+            </div>
+          </div>
+          <Link href="/admin/businesses" className="text-sm font-medium text-blue-600 hover:text-blue-800 mt-4 inline-block">
+            View all →
+          </Link>
+        </div>
+
+        {/* Pending Approvals */}
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm">Pending Businesses</p>
+              <h3 className="text-3xl font-bold text-[#343A40]">{pendingBusinesses}</h3>
+            </div>
+            <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+              <span className="material-symbols-outlined text-yellow-600">pending</span>
+            </div>
+          </div>
+          <Link href="/admin/businesses?status=pending" className="text-sm font-medium text-yellow-600 hover:text-yellow-800 mt-4 inline-block">
+            Review now →
+          </Link>
+        </div>
+
+        {/* Pending Claims */}
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm">Pending Claims</p>
+              <h3 className="text-3xl font-bold text-[#343A40]">{pendingClaims}</h3>
+            </div>
+            <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+              <span className="material-symbols-outlined text-orange-600">verified</span>
+            </div>
+          </div>
+          <Link href="/admin/claims" className="text-sm font-medium text-orange-600 hover:text-orange-800 mt-4 inline-block">
+            Review claims →
+          </Link>
+        </div>
+
+        {/* Featured Businesses */}
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm">Featured Businesses</p>
+              <h3 className="text-3xl font-bold text-[#343A40]">{featuredBusinesses}</h3>
+            </div>
+            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+              <span className="material-symbols-outlined text-purple-600">star</span>
+            </div>
+          </div>
+          <Link href="/admin/businesses?featured=true" className="text-sm font-medium text-purple-600 hover:text-purple-800 mt-4 inline-block">
+            View featured →
+          </Link>
+        </div>
+
+        {/* Active Coupons */}
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm">Active Coupons</p>
+              <h3 className="text-3xl font-bold text-[#343A40]">{activeCoupons}</h3>
+            </div>
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <span className="material-symbols-outlined text-green-600">local_offer</span>
+            </div>
+          </div>
+          <Link href="/admin/coupons" className="text-sm font-medium text-green-600 hover:text-green-800 mt-4 inline-block">
+            Manage coupons →
+          </Link>
+        </div>
+
+        {/* Total Users */}
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm">Total Users</p>
+              <h3 className="text-3xl font-bold text-[#343A40]">{totalUsers}</h3>
+            </div>
+            <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+              <span className="material-symbols-outlined text-indigo-600">group</span>
+            </div>
+          </div>
+          <Link href="/admin/users" className="text-sm font-medium text-indigo-600 hover:text-indigo-800 mt-4 inline-block">
+            View users →
+          </Link>
+        </div>
+      </div>
+
+      {/* Quick Actions & Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-xl font-bold text-[#343A40] mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-2 gap-4">
             <Link
               href="/admin/businesses?status=pending"
-              className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+              className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-[#17cf73] hover:bg-green-50 transition-colors"
             >
-              <svg className="w-6 h-6 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="text-sm font-medium text-gray-700">Approve Businesses</span>
+              <span className="material-symbols-outlined text-gray-500">task_alt</span>
+              <span className="text-sm font-medium text-[#343A40]">Approve Businesses</span>
             </Link>
-
             <Link
               href="/admin/claims"
-              className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+              className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-[#17cf73] hover:bg-green-50 transition-colors"
             >
-              <svg className="w-6 h-6 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              <span className="text-sm font-medium text-gray-700">Process Claims</span>
+              <span className="material-symbols-outlined text-gray-500">verified</span>
+              <span className="text-sm font-medium text-[#343A40]">Process Claims</span>
             </Link>
-
             <Link
               href="/admin/coupons"
-              className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+              className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-[#17cf73] hover:bg-green-50 transition-colors"
             >
-              <svg className="w-6 h-6 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              <span className="text-sm font-medium text-gray-700">Create Coupon</span>
+              <span className="material-symbols-outlined text-gray-500">add_circle</span>
+              <span className="text-sm font-medium text-[#343A40]">Create Coupon</span>
+            </Link>
+            <Link
+              href="/admin/events"
+              className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-[#17cf73] hover:bg-green-50 transition-colors"
+            >
+              <span className="material-symbols-outlined text-gray-500">event</span>
+              <span className="text-sm font-medium text-[#343A40]">Manage Events</span>
             </Link>
           </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-xl font-bold text-[#343A40] mb-4">Recent Activity</h2>
+          <div className="space-y-4">
+            {recentActivity.map((activity) => (
+              <div key={activity.id} className="flex items-start gap-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  activity.color === 'blue' ? 'bg-blue-100' :
+                  activity.color === 'orange' ? 'bg-orange-100' :
+                  activity.color === 'green' ? 'bg-green-100' :
+                  activity.color === 'yellow' ? 'bg-yellow-100' :
+                  'bg-purple-100'
+                }`}>
+                  <span className={`material-symbols-outlined text-lg ${
+                    activity.color === 'blue' ? 'text-blue-600' :
+                    activity.color === 'orange' ? 'text-orange-600' :
+                    activity.color === 'green' ? 'text-green-600' :
+                    activity.color === 'yellow' ? 'text-yellow-600' :
+                    'text-purple-600'
+                  }`}>{activity.icon}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#343A40]">{activity.action}</p>
+                  <p className="text-sm text-gray-500 truncate">{activity.details}</p>
+                </div>
+                <span className="text-xs text-gray-400 whitespace-nowrap">{activity.time}</span>
+              </div>
+            ))}
+          </div>
+          <Link href="/admin/logs" className="text-sm font-medium text-[#17cf73] hover:text-[#13ec80] mt-4 inline-block">
+            View all activity →
+          </Link>
         </div>
       </div>
     </div>
