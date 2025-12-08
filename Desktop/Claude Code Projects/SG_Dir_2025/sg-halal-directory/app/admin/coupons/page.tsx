@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { getCoupons } from '@/app/actions/admin'
 import CouponForm from './components/CouponForm'
 import CouponsTable from './components/CouponsTable'

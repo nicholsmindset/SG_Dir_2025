@@ -30,7 +30,7 @@ export default async function AdminDashboardPage() {
 
   // Only fetch from Supabase if configured
   if (isSupabaseConfigured()) {
-    const { createClient } = await import('@/utils/supabase/server');
+    const { createClient } = await import('@/lib/supabase/server');
     const { redirect } = await import('next/navigation');
 
     const supabase = await createClient();

@@ -2,7 +2,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import { getUser } from "@/app/actions/auth";
 import { redirect } from "next/navigation";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import ClaimBusinessForm from "./ClaimBusinessForm";
 import type { Metadata } from "next";
 
