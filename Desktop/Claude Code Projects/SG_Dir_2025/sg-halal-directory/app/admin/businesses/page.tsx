@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { getBusinesses } from '@/app/actions/admin'
 import BusinessFilters from './components/BusinessFilters'
 import BusinessesTable from './components/BusinessesTable'

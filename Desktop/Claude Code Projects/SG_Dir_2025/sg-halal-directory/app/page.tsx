@@ -1,96 +1,136 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { createClient } from "@/lib/supabase/server";
 
-export default function Home() {
-  // Mock data for districts
-  const districts = [
-    {
-      name: "Central Region",
-      slug: "central",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuC2Ljm5a4AeXS252YeM6RME2gi6mbZXzrqTRPN0awZItE1Y11XhI2s7FKxEEWYAQYCZ2yiT3Q24gHpAWjJC0361tSKwcW8WXfoJgRdAvBUMwtrhWATNHsY6Lm7IhQKHl-z-AkI8_OOb7Uwl84fXA22OfrhsCQhffIFFpayCS4F_dnWJag7jKJQsNrb64jNVeffO6fQ3mPsurfrCqoIG_8bsrHzPbDOvCHNiku9O9AwIfEkO_1qCWlEhep4Fo_36IidyCRMs1z8bE9g",
-    },
-    {
-      name: "East Region",
-      slug: "east",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBtO04CLnhFlwzmGLijwlaQSkxM-CikKCZBomS0JHsHrcAWCf8Yk1XGYpMqoKWfLLinrjAIzLAHt3mMFZbToxFvMDd9JrEf6UnDL8fV-iUksLtyWN_sH7b1jhPOIh-zo-hLHs2iXJSALWgJMMTmjOf1Gdd-uDulgeM3-tJ5VAe9VmKb3E51j7wXdRT8SVLoGQZ4ywQRViJ32cjnd6vUHBfVWbyruJvk8PyhAPuAZOEn7xv4bqQepPYMrXKVirOGcdis3CBNQt60edg",
-    },
-    {
-      name: "West Region",
-      slug: "west",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAiBBsnGpe4BqS4BT1E7kwSVTJ-QofXbAQ2I6uIoWUplLBoZhps3zuhA47iMOg0IQamIC63TshRvt75bUb-ih7nYfBl56-NWFtiW2fXEtRElGbSSBfzLWrBJeIoVl9uhHikPKQlwzq9Ve9c6N6EVPxAmL8aQKBupj1QP5Smurr43f6kB1DjTNqkLDcqEtFG3VJ003Pz11K9Q2N4YliVI025xxAgDLd--D6sPqO05rJAtDBFNkZJka_VSqkpHkNk2Fzs9SaqOZFIkEk",
-    },
-    {
-      name: "North Region",
-      slug: "north",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBRXCuE5i6se2NlUPwMpeItcA1gI3hNNExAFqv8xfgwbNZI8_BxpyfI6b97i0CX4REiPq02Rr_W1Iw3WD7G4Zn6R8jsWmqtUfcyEsa7BACNyVlv-gvwAwBGzaEoOR2cF5pZ8L5XLRhmVImfES7F_6Ym6Jr3G-VYTnWvXxa9pRsAGesKOHbo5pHCw5m8zlovs6a8pM-K2F1CTeR3nkz2eOggFuXD7eoNsAYfoEEjKfv7Xfrd08u4rpV_78hylMsirt8cLNwhwtIOIcs",
-    },
+// Default placeholder images for regions without images
+const REGION_IMAGES: Record<string, string> = {
+  central: "https://lh3.googleusercontent.com/aida-public/AB6AXuC2Ljm5a4AeXS252YeM6RME2gi6mbZXzrqTRPN0awZItE1Y11XhI2s7FKxEEWYAQYCZ2yiT3Q24gHpAWjJC0361tSKwcW8WXfoJgRdAvBUMwtrhWATNHsY6Lm7IhQKHl-z-AkI8_OOb7Uwl84fXA22OfrhsCQhffIFFpayCS4F_dnWJag7jKJQsNrb64jNVeffO6fQ3mPsurfrCqoIG_8bsrHzPbDOvCHNiku9O9AwIfEkO_1qCWlEhep4Fo_36IidyCRMs1z8bE9g",
+  east: "https://lh3.googleusercontent.com/aida-public/AB6AXuBtO04CLnhFlwzmGLijwlaQSkxM-CikKCZBomS0JHsHrcAWCf8Yk1XGYpMqoKWfLLinrjAIzLAHt3mMFZbToxFvMDd9JrEf6UnDL8fV-iUksLtyWN_sH7b1jhPOIh-zo-hLHs2iXJSALWgJMMTmjOf1Gdd-uDulgeM3-tJ5VAe9VmKb3E51j7wXdRT8SVLoGQZ4ywQRViJ32cjnd6vUHBfVWbyruJvk8PyhAPuAZOEn7xv4bqQepPYMrXKVirOGcdis3CBNQt60edg",
+  west: "https://lh3.googleusercontent.com/aida-public/AB6AXuAiBBsnGpe4BqS4BT1E7kwSVTJ-QofXbAQ2I6uIoWUplLBoZhps3zuhA47iMOg0IQamIC63TshRvt75bUb-ih7nYfBl56-NWFtiW2fXEtRElGbSSBfzLWrBJeIoVl9uhHikPKQlwzq9Ve9c6N6EVPxAmL8aQKBupj1QP5Smurr43f6kB1DjTNqkLDcqEtFG3VJ003Pz11K9Q2N4YliVI025xxAgDLd--D6sPqO05rJAtDBFNkZJka_VSqkpHkNk2Fzs9SaqOZFIkEk",
+  north: "https://lh3.googleusercontent.com/aida-public/AB6AXuBRXCuE5i6se2NlUPwMpeItcA1gI3hNNExAFqv8xfgwbNZI8_BxpyfI6b97i0CX4REiPq02Rr_W1Iw3WD7G4Zn6R8jsWmqtUfcyEsa7BACNyVlv-gvwAwBGzaEoOR2cF5pZ8L5XLRhmVImfES7F_6Ym6Jr3G-VYTnWvXxa9pRsAGesKOHbo5pHCw5m8zlovs6a8pM-K2F1CTeR3nkz2eOggFuXD7eoNsAYfoEEjKfv7Xfrd08u4rpV_78hylMsirt8cLNwhwtIOIcs",
+  default: "https://lh3.googleusercontent.com/aida-public/AB6AXuBDH1HgNYD19VDoP8O96wOkz92rXN3nsjO58aCd8GYifKUFXUO7JlJMNGWQFPFTcW34gbX29hwJ5Mux1l-qbl6qUe8XM1KXUTcstS_Em6Bj-ORhpymobA0VM3vx-vxxh9zjHypcv7qO6oKhnRmfGAXWYzWUYl-3R1q0x8oW1U7x7PRNOXmn008X0-fkUOs56xW-7DPOiJ60NXBgVtWqY0VARVI0YRAd8K3bIBfEOc5bwFhEu85-pOUO0OZK6_MhmKuqdvg5EM4d9F8",
+};
+
+// Default business placeholder image
+const DEFAULT_BUSINESS_IMAGE = "https://lh3.googleusercontent.com/aida-public/AB6AXuB2T-66vsVZOhwIEKjymftXirfCd1BtGKBqO2wb15YregvEkueY8u39x4c3B-o3J74qOtT8z2TD8Uo38gAVNseN1VcIpGR6CY3jcedJA6-e7Q0zleNSCUZiQEJGEfgReYb7y0jCmLfs-Q6mWUPY8NR9lspbPNBfGxJ5TqSCQEfjrgWt8NyZ0Eb2eOF5Jp7QCnrOYd2A5fOhGmBN98B3DWfRO7AMLS6wbch36H75eCLJ_qSoyZlOtwe2KodujBj0Qn2hL2kUxgV6K3Q";
+
+// Helper function to get time ago string
+function getTimeAgo(date: Date): string {
+  const now = new Date();
+  const diffInMs = now.getTime() - date.getTime();
+  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+  if (diffInDays === 0) return "Today";
+  if (diffInDays === 1) return "1 day ago";
+  if (diffInDays < 7) return `${diffInDays} days ago`;
+  if (diffInDays < 14) return "1 week ago";
+  if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
+  return `${Math.floor(diffInDays / 30)} months ago`;
+}
+
+export default async function Home() {
+  const supabase = await createClient();
+
+  // Fetch areas/regions from database
+  const { data: areasData } = await supabase
+    .from("areas")
+    .select("id, name, slug, business_count")
+    .order("business_count", { ascending: false })
+    .limit(4);
+
+  // Transform areas data with images
+  const districts = (areasData || []).map((area) => ({
+    name: area.name,
+    slug: area.slug,
+    image: REGION_IMAGES[area.slug.toLowerCase()] || REGION_IMAGES.default,
+    businessCount: area.business_count,
+  }));
+
+  // If no areas in database, use fallback data
+  const fallbackDistricts = [
+    { name: "Central Region", slug: "central", image: REGION_IMAGES.central, businessCount: 0 },
+    { name: "East Region", slug: "east", image: REGION_IMAGES.east, businessCount: 0 },
+    { name: "West Region", slug: "west", image: REGION_IMAGES.west, businessCount: 0 },
+    { name: "North Region", slug: "north", image: REGION_IMAGES.north, businessCount: 0 },
   ];
 
-  // Mock data for featured businesses
-  const featuredBusinesses = [
-    {
-      id: "padi-bussorah",
-      name: "Padi @ Bussorah",
-      type: "Restaurant",
-      location: "Bugis",
-      rating: 4,
-      reviews: 1204,
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB2T-66vsVZOhwIEKjymftXirfCd1BtGKBqO2wb15YregvEkueY8u39x4c3B-o3J74qOtT8z2TD8Uo38gAVNseN1VcIpGR6CY3jcedJA6-e7Q0zleNSCUZiQEJGEfgReYb7y0jCmLfs-Q6mWUPY8NR9lspbPNBfGxJ5TqSCQEfjrgWt8NyZ0Eb2eOF5Jp7QCnrOYd2A5fOhGmBN98B3DWfRO7AMLS6wbch36H75eCLJ_qSoyZlOtwe2KodujBj0Qn2hL2kUxgV6K3Q",
-    },
-    {
-      id: "malayan-council",
-      name: "The Malayan Council",
-      type: "Restaurant",
-      location: "Bugis",
-      rating: 4.5,
-      reviews: 987,
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAXOS-J0CV0QVMO9oqr7d5od3PFRbZkVB9w7rGAQb4MiccWBoeoiOAHLHCgHM5gfwlh9j0dimvanzHedAjADBgJJ4ZoOkV7IyyDKV3bQDur4t8cY-bJ0ftwBUQ6-2c5GPcpFW31BRlY-snkBpMfu0ga4IzcRtr54MYXw29XydopIL8NLjM4PNnYEzVARtNMqUhxUDLLP_CiRBiXRkhe6Ja0LJRgtV1uDRdDz47XvaTJA9NljZWBq3v7HkdONqnxl4nLNVoVXvkk4s8",
-    },
-    {
-      id: "carousel-buffet",
-      name: "Carousel Buffet",
-      type: "Buffet",
-      location: "Orchard",
-      rating: 5,
-      reviews: 2150,
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuD6kNecFkMHHeuYfK7UDTuf8f7LescD8ySUaG7kU2hlhOJ5nm0kZC1xw3Nm2_FtikHdEAnhZBdAVKz5PAa2Ki8eno0UA0sRecl2fiAIuNVCXZs-ZQ09Cez0aYlhZTPmGRtg86Pcvv6UBe9sTMJG5IxzdSCgM_IX9Xi2MS_KKBiYduzaKHyyS4IKCCX11WqwT3KjBmVTdZRiNsQ8-Tw9pTMi0EH15mkAZBUVhOJvibeX9vstUGt0z6XfjkH1eUVk83PkVUD96aL9Xb8",
-    },
-    {
-      id: "bake-joy",
-      name: "Bake & Joy",
-      type: "Bakery",
-      location: "Tampines",
-      rating: 4.5,
-      reviews: 543,
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCwEdx-IwycGMpGxpY2sgU4ANMmCM_eGA7JpjnKDq9m-ntonfeOeBJJMTSOFJNrfwrNGEY3Ql0flgOpwCkbPgvgPmIRTIoIuGhV7nB59QKGj-X303sEyt29POg-95WlbX9DnUz9950it3eNcp5L-fen4TgbG0o7yDeG_a-zsn8SzIN_jLRW_w8CYk8H5NbajjMnXg6s_QuDHYrN-g4t6ftQMOkK82I0vYqIkalaBZKeJpy4hV8obuprVgFbsaMI2BM1yyA1VkTZXEc",
-    },
-  ];
+  const displayDistricts = districts.length > 0 ? districts : fallbackDistricts;
 
-  // Mock data for new listings
-  const newListings = [
-    {
-      id: "grill-master",
-      name: "Grill Master SG",
-      type: "Restaurant",
-      addedAgo: "1 day ago",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuACvqKSd_hONkrof-FGXhw2Ji4zJqRIygLjsH2qO5sT60IBaOd4TPdttNN6qt80ACRxDksOtpnLExnaSjh1g_XYiykAB9SyJRQTKmdPVTsOEAG4r7Y9fsuTcPb7ewznvQZkG2Y2F_4y3-9IELEKMmQzX7pu4PzzUbtgZ_4hRPNlKoDWAkYbcMfC7ccJ8IYYQC4DwJDchPTsHhwbpgxMz7nISL2tD8YkkfKtiib1Gs5gTqrZRDwmud5X3ChadwB_Gla9t8_aj4lAiOU",
-    },
-    {
-      id: "sparkle-clean",
-      name: "Sparkle Clean",
-      type: "Services",
-      addedAgo: "2 days ago",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuA51hpYmxdsn8as4u-4k9jjc9z-jrHf6Vm7Z4XEf1Tih8h3t03m9Z1q4Hwnl8xUF8MUkhG8cTA_XfQ14POInxmHBT_M4IZLn7q4RfCn00XMO4kZZ2guMO88dw0k4cXfvFMTLMSYHFqXpiwlJNheXic5cHPJpkbAFsihg-GlmU5MdawHh54uhD5LwaLjRCys7dJ68dYW2FzGedYjkGWCTqCqzI34tpt9VpC6BRswP0qBBX5T9E722x-OYN7NHBl6smQgZU7vrdXK1Bc",
-    },
-    {
-      id: "ramen-halal",
-      name: "Ramen Halal House",
-      type: "Restaurant",
-      addedAgo: "3 days ago",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDoL_V1BpAnBtuMGRyUTgFIczFyCdXqFGoT34ydp7LyzMUVaZGRIQH-OBtAJeMew7r9ZHrVbrXEMUu301DTQTdlZ-lDhSAO7wLBH2rFz_0rc6hGIn_YwSDu7uK8ImmzQ5nK4sv8puTnf2RAtleGQqjb_KJF90VXBX0ZlZPQk-Qma3UN1k-lXwqlhTBTOF5ve43pEzbxWnPugxn9Sid4nmiT7P0ZladHd0seOYxXHFsGeHln0RzaBoGgFAen3qfiaIGc2lF6Nl20zEY",
-    },
-  ];
+  // Fetch featured businesses from database
+  const { data: featuredData } = await supabase
+    .from("businesses")
+    .select(`
+      id,
+      name,
+      slug,
+      business_type,
+      address,
+      is_featured,
+      area:areas(name)
+    `)
+    .eq("status", "approved")
+    .eq("is_featured", true)
+    .order("created_at", { ascending: false })
+    .limit(4);
+
+  // Fetch primary images for featured businesses
+  const featuredIds = (featuredData || []).map((b) => b.id);
+  const { data: featuredImages } = featuredIds.length > 0
+    ? await supabase
+        .from("images")
+        .select("business_id, url")
+        .in("business_id", featuredIds)
+        .eq("is_primary", true)
+    : { data: [] };
+
+  // Create image lookup map
+  const imageMap = new Map((featuredImages || []).map((img) => [img.business_id, img.url]));
+
+  // Transform featured businesses data
+  const featuredBusinesses = (featuredData || []).map((business) => ({
+    id: business.slug || business.id,
+    name: business.name,
+    type: business.business_type,
+    location: (business.area as { name: string } | null)?.name || "Singapore",
+    image: imageMap.get(business.id) || DEFAULT_BUSINESS_IMAGE,
+  }));
+
+  // Fetch recently added businesses
+  const { data: recentData } = await supabase
+    .from("businesses")
+    .select(`
+      id,
+      name,
+      slug,
+      business_type,
+      created_at
+    `)
+    .eq("status", "approved")
+    .order("created_at", { ascending: false })
+    .limit(3);
+
+  // Fetch images for recent businesses
+  const recentIds = (recentData || []).map((b) => b.id);
+  const { data: recentImages } = recentIds.length > 0
+    ? await supabase
+        .from("images")
+        .select("business_id, url")
+        .in("business_id", recentIds)
+        .eq("is_primary", true)
+    : { data: [] };
+
+  // Create image lookup map for recent
+  const recentImageMap = new Map((recentImages || []).map((img) => [img.business_id, img.url]));
+
+  // Transform recent businesses data
+  const newListings = (recentData || []).map((business) => ({
+    id: business.slug || business.id,
+    name: business.name,
+    type: business.business_type,
+    addedAgo: getTimeAgo(new Date(business.created_at)),
+    image: recentImageMap.get(business.id) || DEFAULT_BUSINESS_IMAGE,
+  }));
 
   // Organization schema for SEO
   const organizationSchema = {
@@ -119,14 +159,14 @@ export default function Home() {
       {/* Header */}
       <Header showSearch={false} />
 
-      <main className="flex-grow">
+      <main id="main-content" className="flex-grow">
         {/* Hero Section */}
         <section className="relative">
           <div className="container mx-auto px-6 py-20 sm:py-24 lg:py-32">
             <div
               className="absolute inset-0 bg-cover bg-center -z-10"
               style={{
-                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.6) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBDH1HgNYD19VDoP8O96wOkz92rXN3nsjO58aCd8GYifKUFXUO7JlJMNGWQFPFTcW34gbX29hwJ5Mux1l-qbl6qUe8XM1KXUTcstS_Em6Bj-ORhpymobA0VM3vx-vxxh9zjHypcv7qO6oKhnRmfGAXWYzWUYl-3R1q0x8oW1U7x7PRNOXmn008X0-fkUOs56xW-7DPOiJ60NXBgVtWqY0VARVI0YRAd8K3bIBfEOc5bwFhEu85-pOUO0OZK6_MhmKuqdvg5EM4d9F8")`,
+                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.6) 100%), url("${REGION_IMAGES.default}")`,
               }}
             />
             <div className="flex min-h-[400px] flex-col gap-8 items-center justify-center text-center">
@@ -142,18 +182,22 @@ export default function Home() {
                 <form action="/search" method="GET" className="flex flex-col h-16 w-full">
                   <div className="flex w-full flex-1 items-stretch rounded-xl shadow-lg">
                     <div className="hidden sm:flex bg-white items-center justify-center pl-4 pr-2 rounded-l-xl">
+                      <label htmlFor="category" className="sr-only">Category</label>
                       <select
+                        id="category"
                         name="category"
                         className="w-full h-full border-0 bg-transparent text-[#343A40] focus:ring-0 text-sm font-medium"
                       >
                         <option value="">All Categories</option>
-                        <option value="food">Food & Beverage</option>
-                        <option value="retail">Retail</option>
-                        <option value="services">Services</option>
-                        <option value="health">Health & Wellness</option>
+                        <option value="Restaurant">Food & Beverage</option>
+                        <option value="Retail">Retail</option>
+                        <option value="Services">Services</option>
+                        <option value="Health">Health & Wellness</option>
                       </select>
                     </div>
+                    <label htmlFor="search-query" className="sr-only">Search query</label>
                     <input
+                      id="search-query"
                       type="text"
                       name="q"
                       className="flex w-full min-w-0 flex-1 resize-none overflow-hidden text-[#343A40] focus:outline-0 focus:ring-2 focus:ring-[#17cf73]/50 border-0 bg-white h-full placeholder:text-gray-500 px-5 text-base sm:rounded-l-none"
@@ -186,10 +230,10 @@ export default function Home() {
             Explore by Region
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {districts.map((district) => (
+            {displayDistricts.map((district) => (
               <Link
                 key={district.slug}
-                href={`/directory?location=${district.slug}`}
+                href={`/areas/${district.slug}`}
                 className="relative group overflow-hidden rounded-xl cursor-pointer"
               >
                 <div
@@ -197,6 +241,8 @@ export default function Home() {
                   style={{
                     backgroundImage: `linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 40%), url("${district.image}")`,
                   }}
+                  role="img"
+                  aria-label={`${district.name} region`}
                 />
                 <p className="absolute bottom-4 left-4 text-white text-lg font-bold">{district.name}</p>
               </Link>
@@ -212,49 +258,48 @@ export default function Home() {
                 Featured Businesses
               </h2>
               <Link href="/directory" className="text-[#17cf73] font-semibold hover:underline">
-                View all →
+                View all &rarr;
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredBusinesses.map((business) => (
-                <Link
-                  key={business.id}
-                  href={`/business/${business.id}`}
-                  className="bg-[#f6f8f7] dark:bg-gray-700 rounded-xl overflow-hidden shadow-md group border-2 border-transparent hover:border-[#17cf73] hover:shadow-xl transition-all duration-300"
-                >
-                  <div className="relative">
-                    <div
-                      className="bg-cover bg-center h-40"
-                      style={{ backgroundImage: `url("${business.image}")` }}
-                    />
-                    <span className="absolute top-3 right-3 bg-[#17cf73] text-white text-xs font-bold px-2 py-1 rounded-full">
-                      Featured
-                    </span>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-lg text-[#343A40] dark:text-gray-100">{business.name}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{business.type}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">{business.location}</p>
-                    <div className="flex items-center mt-2">
-                      <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                          <span
-                            key={i}
-                            className={`material-symbols-outlined text-sm ${
-                              i < Math.floor(business.rating) ? "text-[#FFC107]" : "text-gray-300"
-                            }`}
-                            style={{ fontVariationSettings: "'FILL' 1" }}
-                          >
-                            star
-                          </span>
-                        ))}
-                      </div>
-                      <span className="text-xs text-gray-500 ml-1">({business.reviews.toLocaleString()})</span>
+            {featuredBusinesses.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {featuredBusinesses.map((business) => (
+                  <Link
+                    key={business.id}
+                    href={`/business/${business.id}`}
+                    className="bg-[#f6f8f7] dark:bg-gray-700 rounded-xl overflow-hidden shadow-md group border-2 border-transparent hover:border-[#17cf73] hover:shadow-xl transition-all duration-300"
+                  >
+                    <div className="relative">
+                      <div
+                        className="bg-cover bg-center h-40"
+                        style={{ backgroundImage: `url("${business.image}")` }}
+                        role="img"
+                        aria-label={`Photo of ${business.name}`}
+                      />
+                      <span className="absolute top-3 right-3 bg-[#17cf73] text-white text-xs font-bold px-2 py-1 rounded-full">
+                        Featured
+                      </span>
                     </div>
-                  </div>
+                    <div className="p-4">
+                      <h3 className="font-bold text-lg text-[#343A40] dark:text-gray-100">{business.name}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{business.type}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">{business.location}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                <p className="text-gray-500 dark:text-gray-400 mb-4">No featured businesses yet.</p>
+                <Link
+                  href="/submit"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#17cf73] text-white rounded-lg font-bold hover:opacity-90 transition-opacity"
+                >
+                  <span className="material-symbols-outlined" aria-hidden="true">add_business</span>
+                  Be the first to list!
                 </Link>
-              ))}
-            </div>
+              </div>
+            )}
           </div>
         </section>
 
@@ -266,13 +311,13 @@ export default function Home() {
               Sign up for our newsletter to get the latest listings and exclusive deals delivered to your inbox.
             </p>
             <form className="mt-6 flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
-              <label className="sr-only" htmlFor="email">
+              <label className="sr-only" htmlFor="newsletter-email">
                 Email address
               </label>
               <input
                 autoComplete="email"
                 className="w-full rounded-lg border-0 px-5 py-3 text-[#343A40] placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-white"
-                id="email"
+                id="newsletter-email"
                 name="email"
                 placeholder="Enter your email address"
                 required
@@ -295,28 +340,36 @@ export default function Home() {
               Newly Added
             </h2>
             <Link href="/directory?sort=newest" className="text-[#17cf73] font-semibold hover:underline">
-              See more →
+              See more &rarr;
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {newListings.map((listing) => (
-              <Link
-                key={listing.id}
-                href={`/business/${listing.id}`}
-                className="bg-white dark:bg-gray-800 p-5 rounded-lg flex items-center gap-4 border border-gray-200 dark:border-gray-700 hover:border-[#17cf73] transition-colors"
-              >
-                <div
-                  className="flex-shrink-0 w-16 h-16 bg-gray-200 rounded-lg bg-cover bg-center"
-                  style={{ backgroundImage: `url("${listing.image}")` }}
-                />
-                <div>
-                  <h3 className="font-bold text-[#343A40] dark:text-gray-100">{listing.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{listing.type}</p>
-                  <p className="text-xs text-gray-500 mt-1">Added {listing.addedAgo}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {newListings.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {newListings.map((listing) => (
+                <Link
+                  key={listing.id}
+                  href={`/business/${listing.id}`}
+                  className="bg-white dark:bg-gray-800 p-5 rounded-lg flex items-center gap-4 border border-gray-200 dark:border-gray-700 hover:border-[#17cf73] transition-colors"
+                >
+                  <div
+                    className="flex-shrink-0 w-16 h-16 bg-gray-200 rounded-lg bg-cover bg-center"
+                    style={{ backgroundImage: `url("${listing.image}")` }}
+                    role="img"
+                    aria-label={`Photo of ${listing.name}`}
+                  />
+                  <div>
+                    <h3 className="font-bold text-[#343A40] dark:text-gray-100">{listing.name}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{listing.type}</p>
+                    <p className="text-xs text-gray-500 mt-1">Added {listing.addedAgo}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-gray-50 dark:bg-gray-700 rounded-xl">
+              <p className="text-gray-500 dark:text-gray-400">No businesses listed yet. Be the first!</p>
+            </div>
+          )}
         </section>
 
         {/* CTA Section */}
@@ -332,7 +385,7 @@ export default function Home() {
               href="/submit"
               className="inline-flex items-center gap-2 px-8 py-4 bg-[#17cf73] text-white rounded-lg font-bold text-lg hover:opacity-90 transition-opacity"
             >
-              <span className="material-symbols-outlined">add_business</span>
+              <span className="material-symbols-outlined" aria-hidden="true">add_business</span>
               List Your Business Free
             </Link>
           </div>

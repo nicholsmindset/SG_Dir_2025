@@ -15,7 +15,7 @@ export default async function AdminLayout({
 
   // Only check auth if Supabase is configured
   if (isSupabaseConfigured()) {
-    const { createClient } = await import('@/utils/supabase/server');
+    const { createClient } = await import('@/lib/supabase/server');
     const { redirect } = await import('next/navigation');
 
     const supabase = await createClient();
