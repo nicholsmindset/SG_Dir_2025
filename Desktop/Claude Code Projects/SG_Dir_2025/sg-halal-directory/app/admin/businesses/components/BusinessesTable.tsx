@@ -47,8 +47,8 @@ export default function BusinessesTable({ businesses }: BusinessesTableProps) {
     try {
       await updateBusinessStatus(businessId, newStatus)
       // Page will auto-refresh due to revalidatePath
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsUpdating(false)
     }
@@ -65,8 +65,8 @@ export default function BusinessesTable({ businesses }: BusinessesTableProps) {
       setShowFeaturedModal(false)
       setSelectedBusiness(null)
       // Page will auto-refresh due to revalidatePath
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsUpdating(false)
     }
@@ -83,8 +83,8 @@ export default function BusinessesTable({ businesses }: BusinessesTableProps) {
     try {
       await removeFeatured(businessId)
       // Page will auto-refresh due to revalidatePath
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsUpdating(false)
     }

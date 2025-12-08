@@ -37,8 +37,8 @@ export default function CouponsTable({ coupons }: CouponsTableProps) {
     try {
       await toggleCouponStatus(couponId, !currentStatus)
       // Page will auto-refresh due to revalidatePath
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsUpdating(null)
     }

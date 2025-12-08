@@ -54,8 +54,8 @@ export default function ClaimsTable({ claims, status }: ClaimsTableProps) {
       await approveClaim(claimId)
       setSelectedClaim(null)
       // Page will auto-refresh due to revalidatePath
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsApproving(false)
     }
@@ -75,8 +75,8 @@ export default function ClaimsTable({ claims, status }: ClaimsTableProps) {
       setSelectedClaim(null)
       setRejectNotes('')
       // Page will auto-refresh due to revalidatePath
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsRejecting(false)
     }

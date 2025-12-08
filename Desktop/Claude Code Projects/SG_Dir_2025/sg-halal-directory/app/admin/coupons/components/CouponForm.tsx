@@ -56,8 +56,8 @@ export default function CouponForm() {
 
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(false), 3000)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsSubmitting(false)
     }

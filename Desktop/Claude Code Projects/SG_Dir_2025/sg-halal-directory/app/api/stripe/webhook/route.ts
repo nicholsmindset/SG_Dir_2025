@@ -13,6 +13,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
+import Stripe from 'stripe';
 import { stripe, calculateExpiryDate } from '@/lib/stripe';
 import { createClient } from '@supabase/supabase-js';
 
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify webhook signature
-    let event: any;
+    let event: Stripe.Event;
     try {
       event = stripe.webhooks.constructEvent(
         body,
@@ -92,12 +93,16 @@ export async function POST(request: NextRequest) {
 /**
  * Handle successful payment from checkout.session.completed
  */
-async function handleSuccessfulPayment(session: any) {
+async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
   try {
     const metadata = session.metadata;
+    if (!metadata) {
+      console.error('Missing metadata in checkout session');
+      return;
+    }
     const businessId = metadata.business_id;
     const userId = metadata.user_id;
-    const durationMonths = parseInt(metadata.duration_months);
+    const durationMonths = metadata.duration_months ? parseInt(metadata.duration_months) : 0;
     const couponCode = metadata.coupon_code || null;
 
     if (!businessId || !userId || !durationMonths) {
@@ -193,7 +198,7 @@ async function handleSuccessfulPayment(session: any) {
 /**
  * Handle successful charge (backup handler)
  */
-async function handleSuccessfulCharge(charge: any) {
+async function handleSuccessfulCharge(charge: Stripe.Charge) {
   console.log('Processing charge:', charge.id);
   // Implementation similar to handleSuccessfulPayment
   // Use this as a backup if checkout.session.completed is missed

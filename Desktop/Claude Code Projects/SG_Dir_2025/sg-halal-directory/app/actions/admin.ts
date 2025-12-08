@@ -231,8 +231,14 @@ export async function getBusinesses(filters?: {
   status?: 'pending' | 'approved' | 'rejected'
   area_id?: string
   is_featured?: boolean
+  page?: number
+  limit?: number
 }) {
   const { supabase } = await checkAdminAuth()
+
+  const page = filters?.page ?? 1
+  const limit = filters?.limit ?? 20
+  const offset = (page - 1) * limit
 
   let query = supabase
     .from('businesses')
@@ -240,8 +246,9 @@ export async function getBusinesses(filters?: {
       *,
       area:areas(name, slug),
       claimed_by_profile:profiles!businesses_claimed_by_fkey(full_name, email)
-    `)
+    `, { count: 'exact' })
     .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1)
 
   if (filters?.status) {
     query = query.eq('status', filters.status)
@@ -255,13 +262,19 @@ export async function getBusinesses(filters?: {
     query = query.eq('is_featured', filters.is_featured)
   }
 
-  const { data, error } = await query
+  const { data, error, count } = await query
 
   if (error) {
     throw new Error(`Failed to fetch businesses: ${error.message}`)
   }
 
-  return data
+  return {
+    businesses: data ?? [],
+    totalCount: count ?? 0,
+    page,
+    limit,
+    totalPages: Math.ceil((count ?? 0) / limit)
+  }
 }
 
 export async function updateBusinessStatus(
