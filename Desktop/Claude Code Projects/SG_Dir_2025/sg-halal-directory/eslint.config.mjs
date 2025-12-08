@@ -12,20 +12,31 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Ignore generated types
+    "types/database.ts",
   ]),
-  // Custom rules for deployment readiness
+  // Production-ready rules
   {
     rules: {
-      // Reduce apostrophe escaping to warning (not deployment-blocking)
-      'react/no-unescaped-entities': 'warn',
-      // Allow 'any' type in admin code and third-party integrations
-      '@typescript-eslint/no-explicit-any': 'warn',
-      // Warn on unused variables instead of error
-      '@typescript-eslint/no-unused-vars': 'warn',
-      // Allow <img> elements temporarily (will migrate to Next.js Image)
-      '@next/next/no-img-element': 'warn',
-      // Google Font preconnect is already handled manually
-      '@next/next/google-font-preconnect': 'warn',
+      // Require proper entity escaping
+      'react/no-unescaped-entities': 'error',
+      // Disallow 'any' type - enforce type safety
+      '@typescript-eslint/no-explicit-any': 'error',
+      // Error on unused variables
+      '@typescript-eslint/no-unused-vars': ['error', {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      }],
+      // Require next/image for optimization
+      '@next/next/no-img-element': 'error',
+      // Enforce Google Font optimization
+      '@next/next/google-font-preconnect': 'error',
+      // Prevent common mistakes
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      // Enforce consistent return types
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      // Allow async functions without await (common in Next.js)
+      '@typescript-eslint/require-await': 'off',
     },
   },
 ]);
